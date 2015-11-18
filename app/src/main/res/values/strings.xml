@@ -9,5 +9,5 @@
     <string name="mins">分</string>
     <string name="Humidity">濕度</string>
     <string name="Temperature">溫度</string>
-    <string name="Heat_index">熱指數</string>
+    <string name="Heat_index">體感溫度</string>
 </resources>

@@ -13,17 +13,8 @@
         android:autoText="false"
         android:enabled="true"
         android:textSize="12dp"
-        android:layout_x="5dp"
-        android:layout_y="290dp">
-    </EditText>
-
-    <EditText
-        android:id="@+id/EditText02"
-        android:text="输入要发送的内容"
-        android:layout_width="275dp"
-        android:layout_height="wrap_content"
-        android:layout_y="465dp"
-        android:layout_x="5dp">
+        android:layout_x="7dp"
+        android:layout_y="419dp">
     </EditText>
 
     <Button
@@ -31,17 +22,8 @@
         android:layout_width="75dp"
         android:layout_height="wrap_content"
         android:text="連線"
-        android:layout_x="290dp"
-        android:layout_y="410dp"
-        />
-
-    <Button
-        android:id="@+id/Button_Send"
-        android:layout_width="75dp"
-        android:layout_height="wrap_content"
-        android:text="發送"
-        android:layout_x="290dp"
-        android:layout_y="460dp"
+        android:layout_x="287dp"
+        android:layout_y="359dp"
         />
 
     <Button
@@ -49,8 +31,8 @@
         android:layout_width="75dp"
         android:layout_height="wrap_content"
         android:text="開"
-        android:layout_x="2dp"
-        android:layout_y="410dp"
+        android:layout_x="0dp"
+        android:layout_y="359dp"
         />
 
 
@@ -107,7 +89,7 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:textAppearance="?android:attr/textAppearanceLarge"
-                    android:text="08 : 00"
+                    android:text="00 : 00"
                     android:id="@+id/timer1_start" />
 
                 <TextView
@@ -115,7 +97,7 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:textAppearance="?android:attr/textAppearanceLarge"
-                    android:text="09 : 00"
+                    android:text="00 : 00"
                     android:id="@+id/timer1_end" />
             </TableRow>
             <TableRow
@@ -134,7 +116,7 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:textAppearance="?android:attr/textAppearanceLarge"
-                    android:text="08 : 00"
+                    android:text="00 : 00"
                     android:id="@+id/timer2_start" />
 
                 <TextView
@@ -142,7 +124,7 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:textAppearance="?android:attr/textAppearanceLarge"
-                    android:text="09 : 00"
+                    android:text="00 : 00"
                     android:id="@+id/timer2_end" />
 
             </TableRow>
@@ -161,7 +143,7 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:textAppearance="?android:attr/textAppearanceLarge"
-                    android:text="08 : 00"
+                    android:text="00 : 00"
                     android:id="@+id/timer3_start" />
 
                 <TextView
@@ -169,7 +151,7 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:textAppearance="?android:attr/textAppearanceLarge"
-                    android:text="09 : 00"
+                    android:text="00 : 00"
                     android:id="@+id/timer3_end" />
 
             </TableRow>
