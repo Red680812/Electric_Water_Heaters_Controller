@@ -2,6 +2,7 @@ package com.electric_water_heaters_controller;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.os.Handler;
@@ -38,6 +39,8 @@ import java.net.Socket;
 import java.util.Calendar;
 
 public class Main_Activity extends AppCompatActivity {
+    //public final static String EXTRA_MESSAGE = "com.example.myfirstapp.MESSAGE";
+
     private String[] hoursArray = {"00", "01", "02", "03", "04", "05", "06", "07", "08", "09", "10",
             "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23"};
     private String[] minsArray = {"00", "01", "02", "03", "04", "05", "06", "07", "08", "09", "10",
@@ -59,8 +62,8 @@ public class Main_Activity extends AppCompatActivity {
     private NumberAdapter minAdapter_1;
 
     private final String DEBUG_TAG = "Activity01";
-    private static final String SERVERIP = "192.168.1.185";
-    private static final int SERVERPORT = 8087;
+    private static String SERVERIP = "192.168.1.185";
+    private static int SERVERPORT = 8087;
     private Thread mThread = null;
     private Thread mThread_1 = null;
     private Socket mSocket = null;
@@ -70,6 +73,8 @@ public class Main_Activity extends AppCompatActivity {
     private Button Btn_Timer2_PopupWindow;
     private Button Btn_Timer3_PopupWindow;
     private EditText mEditText01 = null;
+    private EditText mEditText_ip = null;
+    private EditText mEditText_port = null;
     private TextView mTimer1_Start = null;
     private TextView mTimer1_End = null;
     private TextView mTimer2_Start = null;
@@ -96,6 +101,28 @@ public class Main_Activity extends AppCompatActivity {
     /**
      * Called when the activity is first created.
      */
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        //取得SharedPreference設定("Preference"為設定檔的名稱)
+        SharedPreferences settings = getSharedPreferences("Preference", 0);
+        //取出name屬性的字串
+        String IP = settings.getString("IP", "");
+        SERVERIP = IP;
+        String Port = settings.getString("Port", "");
+        SERVERPORT =Integer.parseInt(Port);
+    }
+    protected void onStart () {
+        //取得SharedPreference設定("Preference"為設定檔的名稱)
+        SharedPreferences settings = getSharedPreferences("Preference", 0);
+        //取出name屬性的字串
+        String IP = settings.getString("IP", "");
+        SERVERIP = IP;
+        String Port = settings.getString("Port", "");
+        SERVERPORT =Integer.parseInt(Port);
+        Log.e(DEBUG_TAG, "Settings onStart ");
+        super.onStart();
+    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -240,18 +267,22 @@ public class Main_Activity extends AppCompatActivity {
 
     @Override
     protected void onStop() {
-        Socket_conning_close();
-        android.os.Process.killProcess(android.os.Process.myPid());
-        finish();
+        if (Socket_conning == true) {
+            Socket_conning_close();
+            //android.os.Process.killProcess(android.os.Process.myPid());
+            finish();
+        }
         super.onStop();
     }
 
     protected void onDestroy() {
-        RUN_THREAD = false;
-        mThread.interrupt();
-        mThread = null;
-        mThread_1.interrupt();
-        mThread_1 = null;
+        if (Socket_conning == true) {
+            RUN_THREAD = false;
+            mThread.interrupt();
+            mThread = null;
+            mThread_1.interrupt();
+            mThread_1 = null;
+        }
         super.onDestroy();
     }
 
@@ -634,13 +665,22 @@ public class Main_Activity extends AppCompatActivity {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
 
+        int item_id = item.getItemId();
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+        switch (item_id) {
+            case R.id.action_settings:
+                Setting_Activity();
+                break;
+            default:
+                return false;
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    public void Setting_Activity(){
+        Intent intent = new Intent(this, setting.class);
+        startActivity(intent);
     }
 }
