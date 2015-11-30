@@ -53,7 +53,6 @@ public class Main_Activity extends AppCompatActivity {
     private WheelView mMins = null;
     private WheelView mHours_1 = null;
     private WheelView mMins_1 = null;
-    private TextView mTextView = null;
     private View mDecorView = null;
 
     private NumberAdapter hourAdapter;
@@ -72,9 +71,7 @@ public class Main_Activity extends AppCompatActivity {
     private Button Btn_Timer1_PopupWindow;
     private Button Btn_Timer2_PopupWindow;
     private Button Btn_Timer3_PopupWindow;
-    private EditText mEditText01 = null;
-    private EditText mEditText_ip = null;
-    private EditText mEditText_port = null;
+    private TextView mTextViewt01 = null;
     private TextView mTimer1_Start = null;
     private TextView mTimer1_End = null;
     private TextView mTimer2_Start = null;
@@ -84,18 +81,20 @@ public class Main_Activity extends AppCompatActivity {
     private TextView mHumidity = null;
     private TextView mTemperature = null;
     private TextView mHeat_index = null;
-    private TextView mIn_Water = null;
-    private TextView mOut_Water = null;
+    private TextView mWater_In = null;
+    private TextView mWater_Out = null;
+    private TextView mWater_Flow = null;
+    private TextView mCurrent_A = null;
     private CheckBox mCheckBox = null;
     private CheckBox mCheckBox2 = null;
     private CheckBox mCheckBox3 = null;
     private BufferedReader mBufferedReader = null;
     private PrintWriter mPrintWriter = null;
     private String mStrMSG = "";
+    private String Write_Str = "";
     private boolean Socket_conning;
     private boolean RUN_THREAD = true;
     private boolean Write_Str_ = false;
-    private String Write_Str = "";
     private int Group_;
 
     /**
@@ -106,30 +105,32 @@ public class Main_Activity extends AppCompatActivity {
         super.onRestart();
         //取得SharedPreference設定("Preference"為設定檔的名稱)
         SharedPreferences settings = getSharedPreferences("Preference", 0);
-        //取出name屬性的字串
+        //取出IP屬性的字串
         String IP = settings.getString("IP", "");
-        SERVERIP = IP;
+        if (IP != "") SERVERIP = IP;
         String Port = settings.getString("Port", "");
-        SERVERPORT =Integer.parseInt(Port);
+        if (Port != "") SERVERPORT = Integer.parseInt(Port);
     }
-    protected void onStart () {
+
+    protected void onStart() {
         //取得SharedPreference設定("Preference"為設定檔的名稱)
         SharedPreferences settings = getSharedPreferences("Preference", 0);
-        //取出name屬性的字串
+        //取出IP屬性的字串
         String IP = settings.getString("IP", "");
-        SERVERIP = IP;
+        if (IP != "") SERVERIP = IP;
         String Port = settings.getString("Port", "");
-        SERVERPORT =Integer.parseInt(Port);
-        Log.e(DEBUG_TAG, "Settings onStart ");
+        if (Port != "") SERVERPORT = Integer.parseInt(Port);
+        //Log.e(DEBUG_TAG, "Settings onStart ");
         super.onStart();
     }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
         mButton_In = (Button) findViewById(R.id.Button_In);
-        mEditText01 = (EditText) findViewById(R.id.EditText01);
+        mTextViewt01 = (TextView) findViewById(R.id.TextView01);
         mHumidity = (TextView) findViewById(R.id.Humidity);
         mTemperature = (TextView) findViewById(R.id.Temperature);
         mHeat_index = (TextView) findViewById(R.id.Heat_index);
@@ -139,8 +140,10 @@ public class Main_Activity extends AppCompatActivity {
         mTimer2_End = (TextView) findViewById(R.id.timer2_end);
         mTimer3_Start = (TextView) findViewById(R.id.timer3_start);
         mTimer3_End = (TextView) findViewById(R.id.timer3_end);
-        mIn_Water = (TextView) findViewById(R.id.textView7);
-        mOut_Water = (TextView) findViewById(R.id.textView8);
+        mWater_In = (TextView) findViewById(R.id.water_in);
+        mWater_Out = (TextView) findViewById(R.id.water_out);
+        mWater_Flow = (TextView) findViewById(R.id.water_flow);
+        mCurrent_A = (TextView) findViewById(R.id.current_A);
         mCheckBox = (CheckBox) findViewById(R.id.checkBox);
         mCheckBox2 = (CheckBox) findViewById(R.id.checkBox2);
         mCheckBox3 = (CheckBox) findViewById(R.id.checkBox3);
@@ -166,7 +169,7 @@ public class Main_Activity extends AppCompatActivity {
                         // 啟動執行緒
                         msocket.start();
 
-                        Thread.sleep(30);
+                        Thread.sleep(500);
 
                         if (Socket_conning == true) {
                             Toast.makeText(getApplicationContext(), "已連線!", Toast.LENGTH_SHORT).show();
@@ -181,7 +184,7 @@ public class Main_Activity extends AppCompatActivity {
                     }
                 } catch (Exception e) {
                     // TODO: handle exception
-                    Log.e(DEBUG_TAG, e.toString());
+                    Log.e(DEBUG_TAG, "連線: " + e.toString());
                 }
             }
         });
@@ -235,6 +238,7 @@ public class Main_Activity extends AppCompatActivity {
     public void Socket_conning_close() {
         try {
             RUN_THREAD = false;
+            Thread.sleep(100);
             if (mThread != null) {
                 if (!mThread.isInterrupted()) {
                     mThread.interrupt();
@@ -267,22 +271,22 @@ public class Main_Activity extends AppCompatActivity {
 
     @Override
     protected void onStop() {
-        if (Socket_conning == true) {
-            Socket_conning_close();
-            //android.os.Process.killProcess(android.os.Process.myPid());
-            finish();
-        }
+        Log.e(DEBUG_TAG, "onStop");
         super.onStop();
     }
 
     protected void onDestroy() {
-        if (Socket_conning == true) {
-            RUN_THREAD = false;
-            mThread.interrupt();
-            mThread = null;
-            mThread_1.interrupt();
-            mThread_1 = null;
+        try {
+            if (Socket_conning == true) {
+                Socket_conning_close();
+                Thread.sleep(2000);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
+        Log.e(DEBUG_TAG, "onDestroy");
+        android.os.Process.killProcess(android.os.Process.myPid());
+        finish();
         super.onDestroy();
     }
 
@@ -302,24 +306,21 @@ public class Main_Activity extends AppCompatActivity {
                     Log.e(DEBUG_TAG, "已連線");
                 }
             } catch (Exception e) {
-                Log.e(DEBUG_TAG, e.toString());
+                Log.e(DEBUG_TAG, "socket_conning: " + e.toString());
             }
         }
     };
 
-    //�߳�:�����������������Ϣ
     private Runnable mRunnable = new Runnable() {
         public void run() {
             while (RUN_THREAD) {
                 try {
-                    Thread.sleep(500);
                     if ((mStrMSG = mBufferedReader.readLine()) != null) {
                         Log.v(DEBUG_TAG, mStrMSG.toString());
-                        //��Ϣ����
                         mStrMSG += "\n";
                         mHandler.sendMessage(mHandler.obtainMessage());
                     }
-                    // ������Ϣ
+                    Thread.sleep(100);
                 } catch (Exception e) {
                     Log.e(DEBUG_TAG, "mRunnable: " + e.toString());
                 }
@@ -331,7 +332,6 @@ public class Main_Activity extends AppCompatActivity {
         public void run() {
             while (RUN_THREAD) {
                 try {
-                    //Log.v(DEBUG_TAG, "server_status");
                     if (Write_Str_) {
                         mPrintWriter.print(Write_Str);
                         mPrintWriter.flush();
@@ -340,7 +340,7 @@ public class Main_Activity extends AppCompatActivity {
                         mPrintWriter.print(str);
                         mPrintWriter.flush();
                     }
-                    Thread.sleep(1000);
+                    Thread.sleep(300);
                 } catch (Exception e) {
                     Log.e(DEBUG_TAG, "mRunnable_1: " + e.toString());
                 }
@@ -351,38 +351,43 @@ public class Main_Activity extends AppCompatActivity {
     Handler mHandler = new Handler() {
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
-            // ˢ��
             try {
-                //�������¼��ӽ���
-                if (mStrMSG.indexOf("Timer_Set_OK") != -1 || mStrMSG.indexOf("ON") != -1 || mStrMSG.indexOf("OFF") != -1) {
+                if (mStrMSG.indexOf("Timer_Set") != -1 || mStrMSG.indexOf("ON") != -1 || mStrMSG.indexOf("OFF") != -1) {
                     Write_Str_ = false;
+                    mTextViewt01.setText(mStrMSG);
                 } else if (mStrMSG.indexOf("server_status") != -1) {
                     String[] AfterSplit = mStrMSG.split("[,\\s]+"); //切割字元
 
                     mHumidity.setText(AfterSplit[1] + " %");
                     mTemperature.setText(AfterSplit[2] + "℃");
                     mHeat_index.setText(AfterSplit[3] + "℃");
-                    mIn_Water.setText(AfterSplit[4] + "℃");
-                    mOut_Water.setText(AfterSplit[5] + "℃");
+                    mWater_In.setText(AfterSplit[4] + "℃");
+                    mWater_Out.setText(AfterSplit[5] + "℃");
+                    mWater_Flow.setText(AfterSplit[22] + " L/min");
+                    mCurrent_A.setText(AfterSplit[23] + " A");
+
                     if (Integer.valueOf(AfterSplit[21]) == 1) {
                         mButton_On.setText("關");
                     } else {
                         mButton_On.setText("開");
                     }
-                    if (Integer.valueOf(AfterSplit[6]) == 1) {
-                        mCheckBox.setChecked(true);
-                    } else {
-                        mCheckBox.setChecked(false);
-                    }
-                    if (Integer.valueOf(AfterSplit[11]) == 1) {
-                        mCheckBox2.setChecked(true);
-                    } else {
-                        mCheckBox2.setChecked(false);
-                    }
-                    if (Integer.valueOf(AfterSplit[16]) == 1) {
-                        mCheckBox3.setChecked(true);
-                    } else {
-                        mCheckBox3.setChecked(false);
+
+                    if(Write_Str_ == false) {
+                        if (Integer.valueOf(AfterSplit[6]) == 1) {
+                            mCheckBox.setChecked(true);
+                        } else {
+                            mCheckBox.setChecked(false);
+                        }
+                        if (Integer.valueOf(AfterSplit[11]) == 1) {
+                            mCheckBox2.setChecked(true);
+                        } else {
+                            mCheckBox2.setChecked(false);
+                        }
+                        if (Integer.valueOf(AfterSplit[16]) == 1) {
+                            mCheckBox3.setChecked(true);
+                        } else {
+                            mCheckBox3.setChecked(false);
+                        }
                     }
                     mTimer1_Start.setText(String.format("%02d", Integer.parseInt(AfterSplit[7])) + " : " + String.format("%02d", Integer.parseInt(AfterSplit[8])));
                     mTimer1_End.setText(String.format("%02d", Integer.parseInt(AfterSplit[9])) + " : " + String.format("%02d", Integer.parseInt(AfterSplit[10])));
@@ -390,9 +395,8 @@ public class Main_Activity extends AppCompatActivity {
                     mTimer2_End.setText(String.format("%02d", Integer.parseInt(AfterSplit[14])) + " : " + String.format("%02d", Integer.parseInt(AfterSplit[15])));
                     mTimer3_Start.setText(String.format("%02d", Integer.parseInt(AfterSplit[17])) + " : " + String.format("%02d", Integer.parseInt(AfterSplit[18])));
                     mTimer3_End.setText(String.format("%02d", Integer.parseInt(AfterSplit[19])) + " : " + String.format("%02d", Integer.parseInt(AfterSplit[20])));
+                    mTextViewt01.setText(mStrMSG);
                 }
-                mEditText01.setText(mStrMSG);
-
             } catch (Exception e) {
                 Log.e(DEBUG_TAG, e.toString());
             }
@@ -440,7 +444,6 @@ public class Main_Activity extends AppCompatActivity {
         pw.setOutsideTouchable(true);
         // 这个是为了点击“返回Back”也能使其消失，并且并不会影响你的背景
         pw.setBackgroundDrawable(new BitmapDrawable());
-        //WindowManager windowManager = (WindowManager) getSystemService(Context.WINDOW_SERVICE);
 
         //OK按钮及其处理事件
         Button btnOK = (Button) vPopupWindow.findViewById(R.id.BtnOK);
@@ -486,7 +489,6 @@ public class Main_Activity extends AppCompatActivity {
                     }
                 }
                 Write_Str_ = true;
-                //Toast.makeText(getApplicationContext(), text, Toast.LENGTH_SHORT).show();
                 pw.dismiss();//关闭
             }
         });
@@ -501,8 +503,6 @@ public class Main_Activity extends AppCompatActivity {
         });
         //显示popupWindow对话框
         pw.showAtLocation(parent, Gravity.CENTER, 0, 0);
-
-        mTextView = (TextView) vPopupWindow.findViewById(R.id.sel_password);
 
         mHours = (WheelView) vPopupWindow.findViewById(R.id.wheel1);
         mMins = (WheelView) vPopupWindow.findViewById(R.id.wheel2);
@@ -582,8 +582,6 @@ public class Main_Activity extends AppCompatActivity {
             if (index > 0) {
                 ((WheelTextView) parent.getChildAt(index - 1)).setTextSize(20);
             }
-
-            formatData();
         }
 
         @Override
@@ -591,14 +589,6 @@ public class Main_Activity extends AppCompatActivity {
 
         }
     };
-
-    private void formatData() {
-        int pos1 = mHours.getSelectedItemPosition();
-        int pos2 = mMins.getSelectedItemPosition();
-
-        String text = String.format("%d%d", pos1, pos2);
-        mTextView.setText(text);
-    }
 
     private class NumberAdapter extends BaseAdapter {
         int mHeight = 50;
@@ -679,7 +669,7 @@ public class Main_Activity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    public void Setting_Activity(){
+    public void Setting_Activity() {
         Intent intent = new Intent(this, setting.class);
         startActivity(intent);
     }

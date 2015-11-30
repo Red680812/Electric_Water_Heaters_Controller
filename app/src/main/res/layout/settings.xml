@@ -18,6 +18,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="IP"
+            android:textAppearance="?android:attr/textAppearanceLarge"
             android:id="@+id/textView_ip" />
 
         <EditText
@@ -31,6 +32,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Port"
+            android:textAppearance="?android:attr/textAppearanceLarge"
             android:id="@+id/textView_port" />
 
         <EditText

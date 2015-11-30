@@ -33,9 +33,9 @@ public class setting extends AppCompatActivity {
         SharedPreferences settings = getSharedPreferences("Preference", 0);
         //取出name屬性的字串
         String IP = settings.getString("IP", "");
-        mEditText_ip.setText(IP);
+        if(IP != "") mEditText_ip.setText(IP);
         String Port = settings.getString("Port", "");
-        mEditText_port.setText(Port);
+        if(Port != "") mEditText_port.setText(Port);
         Log.e(DEBUG_TAG, "Settings onStart ");
         super.onStart();
     }
@@ -45,15 +45,15 @@ public class setting extends AppCompatActivity {
         //置入name屬性的字串
         settings.edit().putString("IP", mEditText_ip.getText().toString()).commit();
         settings.edit().putString("Port", mEditText_port.getText().toString()).commit();
-        Log.e(DEBUG_TAG, "Settings onPause");
+        //Log.e(DEBUG_TAG, "Settings onPause");
         super.onPause();
     }
     protected void onStop() {
-        Log.e(DEBUG_TAG, "Settings onStop");
+        //Log.e(DEBUG_TAG, "Settings onStop");
         super.onStop();
     }
     protected void onDestroy() {
-        Log.e(DEBUG_TAG, "Settings onDestroy");
+        //Log.e(DEBUG_TAG, "Settings onDestroy");
         super.onDestroy();
     }
 }
